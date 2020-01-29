@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+
+    <script>
+
+      var inputUser, divResults;
+
+      function startup(){
+        var getUsername = '';
+        inputUser = document.getElementById('inputBGGuser');
+        divResults = document.getElementById('divResults');
+        //inputUser.addEventListener('onUpdate', sanitizeAndCheck() );
+        console.log('Started...');
+      }
+
+      function sanitizeAndCheck(){
+
+        let getUsername = inputUser.value;
+        // THEN SANITIZE THIS NAME FOR SPECIAL CHARS
+        divResults.innerHTML = getUsername;
+        console.log(getUsername);
+        getAchievements(getUsername);
+
+      }
+
+      function getAchievements(user){
+
+        // XHTTP request to collections
+        let urlCollections = "https://api.geekdo.com/xmlapi2/collection?username=" + user;
+        // XHTTP request to plays
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+               // Typical action to be performed when the document is ready:
+               let collectionsResponse = xhttp.responseText;
+               parseCollections(collectionsResponse);
+               //document.getElementById("divResults").innerHTML = xhttp.responseText;
+            }
+        };
+        xhttp.open("GET", urlCollections, true);
+        xhttp.send();
+
+      }
+
+      function parseCollections(resp){
+
+        var parser = new DOMParser();
+        var collectionsXML = parser.parseFromString(resp, 'text/xml');
+        var x = collectionsXML.documentElement.childNodes;
+        var ownCount = 0;
+
+        // TESTING
+
+        console.log('x');
+        console.log(x);
+
+        console.log('x[0]');
+        console.log(x[0]);
+
+        console.log('x[0].childNodes[0]');
+        console.log(x[0].childNodes[0]);
+
+        // TESTING
+
+        for (i = 1; i < x.length; i++){
+          console.log(x[i].childNodes[0].nodeValue);
+          //console.log(x[i].nodeName);// + ":" + x[i].childNodes[0].nodeValue);
+        }
+
+      }
+
+    </script>
+
+  </head>
+  <body onload='startup()'>
+    <h1>Board Game Achievements</h1>
+
+    <p>Please enter your BGG username: <input type='text' id='inputBGGuser' placeholder='Your Username' value='EclecticMatt'></input></p>
+
+    <button onclick='sanitizeAndCheck()'>Get Achievements</button>
+
+    <div id='divResults'></div>
+
+  </body>
+
+</html>
