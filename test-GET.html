@@ -6,6 +6,7 @@
     <script>
 
       var inputUser, divResults;
+      var collectionsXML, playsXML;
 
       function startup(){
         var getUsername = '';
@@ -29,7 +30,7 @@
 
         // XHTTP request to collections
         let urlCollections = "https://api.geekdo.com/xmlapi2/collection?username=" + user;
-        // XHTTP request to plays
+
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
@@ -42,32 +43,66 @@
         xhttp.open("GET", urlCollections, true);
         xhttp.send();
 
+        // XHTTP request to plays
+        let urlPlays = "https://api.geekdo.com/xmlapi2/plays?username=" + user;
+
+        var xhttp2 = new XMLHttpRequest();
+        xhttp2.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+               // Typical action to be performed when the document is ready:
+               let playsResponse = xhttp2.responseText;
+               parsePlays(playsResponse);
+               //document.getElementById("divResults").innerHTML = xhttp.responseText;
+            }
+        };
+        xhttp2.open("GET", urlPlays, true);
+        xhttp2.send();
+
+
+
+      }
+
+      function parsePlays(resp){
+        console.log(resp);
       }
 
       function parseCollections(resp){
 
+        // Declare a DOM/XML parser
         var parser = new DOMParser();
+        // Then parse the resp string as XML
         var collectionsXML = parser.parseFromString(resp, 'text/xml');
-        var x = collectionsXML.documentElement.childNodes;
+        // The item array is pulled by tag name
+        var itemArr = collectionsXML.getElementsByTagName("item");
+        // The initial own count
         var ownCount = 0;
+        // Variables within the loop, holding the item being checked
+        var item, details, status;
 
-        // TESTING
+        console.log("Getting owned games list...");
+        divResults.innerHTML = "Getting owned games list...";
 
-        console.log('x');
-        console.log(x);
+        for (i = 1; i < itemArr.length; i++){
 
-        console.log('x[0]');
-        console.log(x[0]);
+          // Each item is contained within itemArr
+          let item = itemArr[i];
+          // The details are contained within "status"
+          let details = item.getElementsByTagName("status")[0].attributes;
+          // Then the key status - owned - is captured here "0" or "1"
+          let status = details.getNamedItem("own").nodeValue;
 
-        console.log('x[0].childNodes[0]');
-        console.log(x[0].childNodes[0]);
+          // If the status is not "0" then add to owned list
+          if (status !== "0"){
 
-        // TESTING
+            console.log(item.childNodes[1].childNodes[0]);
+            ownCount++;
 
-        for (i = 1; i < x.length; i++){
-          console.log(x[i].childNodes[0].nodeValue);
-          //console.log(x[i].nodeName);// + ":" + x[i].childNodes[0].nodeValue);
+          }
+
         }
+
+        console.log('Total Owned: ',ownCount);
+        divResults.innerHTML = 'Total Owned: ' + ownCount;
 
       }
 

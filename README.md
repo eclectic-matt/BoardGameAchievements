@@ -20,3 +20,7 @@ An app which pulls data from BoardGameGeek about games to award achievements
 * https://boardgamegeek.com/wiki/page/BGG_XML_API2
 * https://docs.google.com/spreadsheets/d/1K3rTzlUzqtq5eFEAImKYBK2jiz7k21EIygtOtHHiojk/edit#gid=0
 * https://github.com/eclectic-matt/BoardGameAchievements/blob/master/README.md
+* https://www.w3schools.com/xml/xml_parser.asp
+* https://www.w3schools.com/xml/dom_nodes_nodelist.asp
+* https://www.w3schools.com/xml/tryit.asp?filename=try_dom_nodelist
+* https://www.w3schools.com/xml/tryit.asp?filename=try_dom_attributes
