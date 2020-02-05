@@ -7,6 +7,24 @@
 
       var inputUser, divResults;
       var collectionsXML, playsXML;
+      var userData = {};
+
+      var achievements = {};
+      achievements.list = ["collector", "player"];
+      //achievements.collector[i] = [Level, "Prefix", ownedCount];
+      achievements.collector = [];
+      achievements.collector[0] = [1, "Basic", 5];
+      achievements.collector[1] = [2, "Keen", 100];
+      achievements.collector[2] = [3, "Avid", 500];
+      achievements.collector[3] = [4, "Obsessive", 5000];
+      achievements.collector[4] = [5, "Legendary", 25000];
+      //achievements.player[i] = [Level, "Prefix", playCount];
+      achievements.player = [];
+      achievements.player[0] = [1, "Basic", 5];
+      achievements.player[1] = [2, "Keen", 100];
+      achievements.player[2] = [3, "Avid", 500];
+      achievements.player[3] = [4, "Obsessive", 5000];
+      achievements.player[4] = [5, "Legendary", 25000];
 
       function startup(){
         var getUsername = '';
@@ -18,10 +36,15 @@
 
       function sanitizeAndCheck(){
 
+        userData.name = '';
+        userData.plays = 0;
+        userData.owned = 0;
+        userData.achievements = {};
+
         let getUsername = inputUser.value;
         // THEN SANITIZE THIS NAME FOR SPECIAL CHARS
         divResults.innerHTML = getUsername;
-        console.log(getUsername);
+        console.log('Getting results for ',getUsername);
         getAchievements(getUsername);
 
       }
@@ -62,8 +85,49 @@
 
       }
 
+      function updateResults(){
+        divResults.innerHTML = "Total Owned Games: " + userData.owned;
+        divResults.innerHTML += "<br>Total Logged Plays: " + userData.plays;
+        //divResults.innerHTML += "<br>PLAYER MEDAL: " + userData.plays;
+      }
+
       function parsePlays(resp){
-        console.log(resp);
+        //console.log(resp);
+        var currentResults = divResults.innerHTML;
+
+        // Declare a DOM/XML parser
+        var parser = new DOMParser();
+        // Then parse the resp string as XML
+        var playsXML = parser.parseFromString(resp, 'text/xml');
+
+        // The details are contained within "status"
+        let playsSummary = playsXML.getElementsByTagName("plays")[0].attributes;
+        let playTotal = playsSummary.getNamedItem("total").nodeValue;
+        console.log('Total Plays Logged: ', playTotal);
+        userData.plays = playTotal;
+
+        // Get the hard-coded achievements data for the "player" achievement
+        aPlays = achievements.player;
+        // Assign the earned medal -1 (not achieved)
+        playsMedal = -1;
+
+        // Loop through the achievement requirements
+        for (i = 0; i < aPlays.length; i++){
+
+          // If you have logged at least the required number
+          if (playTotal >= aPlays[i][2]){
+
+            // Assign this medal to playsMedal
+            playsMedal = i;
+            //console.log('Achieved ' + aPlays[i][1] + ' Player Achievement with at least ' + aPlays[i][2] + ' plays logged!');
+
+          }
+
+        }
+
+        console.log('The final player achievement is Level ' + playsMedal);
+        updateResults();
+
       }
 
       function parseCollections(resp){
@@ -80,7 +144,7 @@
         var item, details, status;
 
         console.log("Getting owned games list...");
-        divResults.innerHTML = "Getting owned games list...";
+        //divResults.innerHTML = "Getting owned games list...";
 
         for (i = 1; i < itemArr.length; i++){
 
@@ -94,15 +158,39 @@
           // If the status is not "0" then add to owned list
           if (status !== "0"){
 
-            console.log(item.childNodes[1].childNodes[0]);
+            //console.log(item.childNodes[1].childNodes[0]);
             ownCount++;
 
           }
 
         }
 
-        console.log('Total Owned: ',ownCount);
-        divResults.innerHTML = 'Total Owned: ' + ownCount;
+        console.log('Total Games Owned: ',ownCount);
+        userData.owned = ownCount;
+
+        // Get the hard-coded achievements data for the "player" achievement
+        aOwner = achievements.collector;
+        // Assign the earned medal -1 (not achieved)
+        ownerMedal = -1;
+
+        // Loop through the achievement requirements
+        for (i = 0; i < aOwner.length; i++){
+
+          // If you have logged at least the required number
+          if (ownCount >= aOwner[i][2]){
+
+            // Assign this medal to playsMedal
+            ownerMedal = i;
+            //console.log('Achieved ' + aOwner[i][1] + ' Collector Achievement with at least ' + aOwner[i][2] + ' games owned!');
+
+          }
+
+        }
+
+        console.log('The final collector achievement is Level ' + ownerMedal);
+
+        updateResults();
+        //divResults.innerHTML = 'Total Owned: ' + ownCount;
 
       }
 

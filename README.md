@@ -24,3 +24,9 @@ An app which pulls data from BoardGameGeek about games to award achievements
 * https://www.w3schools.com/xml/dom_nodes_nodelist.asp
 * https://www.w3schools.com/xml/tryit.asp?filename=try_dom_nodelist
 * https://www.w3schools.com/xml/tryit.asp?filename=try_dom_attributes
+
+
+Users to use for testing
+geocentrix
+EclecticMatt
+ColtsFan76
