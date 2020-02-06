@@ -6,12 +6,12 @@ An app which pulls data from BoardGameGeek about games to award achievements
 
 * Get a user name (inputbox)
 * Pull data from BoardGameGeek (note delayed requests and paging)
-** https://api.geekdo.com/xmlapi2/plays?username=EclecticMatt
-** https://api.geekdo.com/xmlapi2/collection?username=EclecticMatt
+  * https://api.geekdo.com/xmlapi2/plays?username=EclecticMatt
+  * https://api.geekdo.com/xmlapi2/collection?username=EclecticMatt
 * Gather generic achievement data
-** PLAYER - Number of plays logged
-** COLLECTOR - Number of games in collection
-** Number of
+  * PLAYER - Number of plays logged
+  * COLLECTOR - Number of games in collection
+  * Number of plays of certain games etc
 
 ## Reference
 
@@ -24,9 +24,10 @@ An app which pulls data from BoardGameGeek about games to award achievements
 * https://www.w3schools.com/xml/dom_nodes_nodelist.asp
 * https://www.w3schools.com/xml/tryit.asp?filename=try_dom_nodelist
 * https://www.w3schools.com/xml/tryit.asp?filename=try_dom_attributes
-
+* https://api.geekdo.com/xmlapi2/plays?username=EclecticMatt&id=167791
 
 Users to use for testing
 geocentrix
 EclecticMatt
 ColtsFan76
+mkgray

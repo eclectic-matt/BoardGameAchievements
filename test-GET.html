@@ -10,8 +10,9 @@
       var userData = {};
 
       var achievements = {};
-      achievements.list = ["collector", "player"];
+      achievements.list = ["collector", "player", "terraformingMars"];
       //achievements.collector[i] = [Level, "Prefix", ownedCount];
+      // Collector - for games collected!
       achievements.collector = [];
       achievements.collector[0] = [1, "Basic", 5];
       achievements.collector[1] = [2, "Keen", 100];
@@ -19,18 +20,40 @@
       achievements.collector[3] = [4, "Obsessive", 5000];
       achievements.collector[4] = [5, "Legendary", 25000];
       //achievements.player[i] = [Level, "Prefix", playCount];
+      // Player - for game plays logged!
       achievements.player = [];
       achievements.player[0] = [1, "Basic", 5];
       achievements.player[1] = [2, "Keen", 100];
       achievements.player[2] = [3, "Avid", 500];
       achievements.player[3] = [4, "Obsessive", 5000];
       achievements.player[4] = [5, "Legendary", 25000];
+      // Terraforming Mars achievements!
+      achievements.terraformingMars = [];
+      // Player - plays logged of Terraforming Mars
+      achievements.terraformingMars['player'] = [];
+      achievements.terraformingMars['player'][0] = [1, "Basic", 5];
+      achievements.terraformingMars['player'][1] = [2, "Keen", 25];
+      achievements.terraformingMars['player'][2] = [3, "Avid", 100];
+      achievements.terraformingMars['player'][3] = [4, "Obsessive", 500];
+      achievements.terraformingMars['player'][4] = [5, "Legendary", 2500];
+
+      achievements.availableGames = [];
+      achievements.availableGames[0] = ['Terraforming Mars', 167791];
+
 
       function startup(){
+
         var getUsername = '';
         inputUser = document.getElementById('inputBGGuser');
-        divResults = document.getElementById('divResults');
-        //inputUser.addEventListener('onUpdate', sanitizeAndCheck() );
+        divResults = document.getElementById('divKeyStats');
+
+        divAchievements = document.getElementById('divAchievements');
+        ulAchievements = document.getElementById('ulGeneralAchievements');
+
+        document.getElementById("btnGetAchieve").addEventListener("click", function(event){
+          event.preventDefault()
+        });
+
         console.log('Started...');
       }
 
@@ -40,13 +63,14 @@
         userData.plays = 0;
         userData.owned = 0;
         userData.achievements = {};
+        userData.achievements.list = [];
 
         let getUsername = inputUser.value;
         // THEN SANITIZE THIS NAME FOR SPECIAL CHARS
         divResults.innerHTML = getUsername;
-        console.log('Getting results for ',getUsername);
         getAchievements(getUsername);
 
+        console.log('Getting results for ',getUsername);
       }
 
       function getAchievements(user){
@@ -61,7 +85,10 @@
                let collectionsResponse = xhttp.responseText;
                parseCollections(collectionsResponse);
                //document.getElementById("divResults").innerHTML = xhttp.responseText;
-            }
+             }else if ( (this.status == 400) || (this.status == 401) || (this.status == 403) ){
+               console.log('Failed to get collections due to CORS error, retrying');
+               getAchievements(user);
+             }
         };
         xhttp.open("GET", urlCollections, true);
         xhttp.send();
@@ -76,6 +103,9 @@
                let playsResponse = xhttp2.responseText;
                parsePlays(playsResponse);
                //document.getElementById("divResults").innerHTML = xhttp.responseText;
+            }else if ( (this.status == 400) || (this.status == 401) || (this.status == 403) ){
+              console.log('Failed to get plays due to CORS error, retrying');
+              getAchievements(user);
             }
         };
         xhttp2.open("GET", urlPlays, true);
@@ -89,6 +119,23 @@
         divResults.innerHTML = "Total Owned Games: " + userData.owned;
         divResults.innerHTML += "<br>Total Logged Plays: " + userData.plays;
         //divResults.innerHTML += "<br>PLAYER MEDAL: " + userData.plays;
+        ulAchievements.innerHTML = "";
+
+        // Get achievements data
+        let listAch = userData.achievements.list;
+        console.log(listAch);
+        // Loop through achievements and add to displayed list
+        for (let i = 0; i < listAch.length; i++){
+          let thisName = listAch[i][0];
+          let getAch = achievements[thisName][listAch[i][1]];
+
+          let thisDesc = "Level " + getAch[0] + " " + getAch[1] + " " + thisName + " (found " + getAch[2] + " or more)";
+
+          let liNew = document.createElement('li');
+          liNew.appendChild(document.createTextNode(thisDesc));
+          ulAchievements.appendChild(liNew);
+        }
+
       }
 
       function parsePlays(resp){
@@ -124,6 +171,8 @@
           }
 
         }
+
+        userData.achievements.list.push(['player', playsMedal]);
 
         console.log('The final player achievement is Level ' + playsMedal);
         updateResults();
@@ -188,7 +237,7 @@
         }
 
         console.log('The final collector achievement is Level ' + ownerMedal);
-
+        userData.achievements.list.push(['collector', ownerMedal]);
         updateResults();
         //divResults.innerHTML = 'Total Owned: ' + ownCount;
 
@@ -200,11 +249,23 @@
   <body onload='startup()'>
     <h1>Board Game Achievements</h1>
 
-    <p>Please enter your BGG username: <input type='text' id='inputBGGuser' placeholder='Your Username' value='EclecticMatt'></input></p>
+    <form id='frmUsername' action=''>
+      <label for='inputBGGuser'>Please enter your BGG username: </label><input type='text' id='inputBGGuser' placeholder='Your Username' value='EclecticMatt'></input>
+      <button id='btnGetAchieve' onclick='sanitizeAndCheck()'>Get Achievements</button>
+    </form>
 
-    <button onclick='sanitizeAndCheck()'>Get Achievements</button>
+    <h2>Key Stats</h2>
+    <div id='divKeyStats'></div>
 
-    <div id='divResults'></div>
+    <h2>Achievements</h2>
+    <div id='divAchievements'>
+
+      <h3>General Achievements</h3>
+      <ul id='ulGeneralAchievements'>
+
+      </ul>
+
+    </div>
 
   </body>
 
